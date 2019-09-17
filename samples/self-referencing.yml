@@ -1,0 +1,10 @@
+jobs:
+  - name: myjob
+    plan:
+      - get: something
+        passed: [myjob]
+
+resources:
+  - name: something
+    type: time
+    source: {interval: 2m}
