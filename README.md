@@ -17,6 +17,8 @@ Result
 
 At the moment, the Concourse web ui can't deal with some cases of cyclic dependencies.
 
+(see https://github.com/concourse/concourse/issues/4445)
+
 
 E.g., consider the following pipeline:
 
