@@ -1,4 +1,8 @@
 jobs:
+  - name: jobA0
+    plan:
+      - get: res-1
+
   - name: jobA
     plan:
       - get: res-1
