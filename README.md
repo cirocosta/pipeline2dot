@@ -40,9 +40,14 @@ jobs:
     plan:
       - get: res-1
         passed: [jobB]
+      - get: res-2
 
 resources:
   - name: res-1
+    type: time
+    source: {interval: 2m}
+
+  - name: res-2
     type: time
     source: {interval: 2m}
 ```
