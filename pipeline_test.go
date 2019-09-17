@@ -77,7 +77,24 @@ jobs:
 		},
 
 		{
-			desc: "with duplicate deps",
+			desc: "with duplicate passed",
+			content: `
+jobs:
+- name: test
+  plan:
+  - in_parallel:
+    - get: resource
+      passed: [a]
+    - get: resource2
+      passed: [a]
+`,
+			expected: Digraph{
+				{From: "a", To: "test"},
+			},
+		},
+
+		{
+			desc: "with same step duplicate passed",
 			content: `
 jobs:
 - name: test

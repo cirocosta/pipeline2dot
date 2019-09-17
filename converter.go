@@ -2,7 +2,7 @@ package main
 
 func ToDigraph(p Pipeline) (g Digraph, err error) {
 	for _, job := range p.Jobs {
-		deps := getJobDependencies(&job.Plan)
+		deps := unique(getJobDependencies(&job.Plan))
 
 		for _, dep := range deps {
 			g = append(g, Edge{
@@ -10,6 +10,20 @@ func ToDigraph(p Pipeline) (g Digraph, err error) {
 				To:   job.Name,
 			})
 		}
+	}
+
+	return
+}
+
+func unique(slice []string) (u []string) {
+	m := map[string]interface{}{}
+
+	for _, item := range slice {
+		m[item] = nil
+	}
+
+	for k := range m {
+		u = append(u, k)
 	}
 
 	return
