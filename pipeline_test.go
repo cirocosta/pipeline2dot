@@ -2,136 +2,44 @@ package main
 
 import (
 	"bytes"
-	"reflect"
 	"testing"
 )
 
-func TestConversion(t *testing.T) {
-	var cases = []struct {
-		desc     string
-		content  string
-		expected Digraph
-	}{
-		{
-			desc: "no deps",
-			content: `
+var pipelineCases = []struct {
+	desc, pipeline string
+}{
+	{
+		desc: "simple",
+		pipeline: `
+resources:
+- name: lol
+  source:
+    aa
+
 jobs:
 - name: test
   plan:
-  - get: resource
+  - get: lol
 `,
-		},
-
-		{
-			desc: "single job, with deps",
-			content: `
+	},
+	{
+		desc: "with in_parallel",
+		pipeline: `
 jobs:
-- name: test
-  plan:
-  - get: resource
-    passed: [a,b,c]
-`,
-			expected: Digraph{
-				{From: "a", To: "test"},
-				{From: "b", To: "test"},
-				{From: "c", To: "test"},
-			},
-		},
-
-		{
-			desc: "multiple jobs, with deps",
-			content: `
-jobs:
-- name: test
-  plan:
-  - get: resource
-    passed: [a]
-
-- name: test2
-  plan:
-  - get: resource
-    passed: [test]
-`,
-			expected: Digraph{
-				{From: "a", To: "test"},
-				{From: "test", To: "test2"},
-			},
-		},
-
-		{
-			desc: "with seqs, with deps",
-			content: `
-jobs:
-- name: test
-  plan:
   - in_parallel:
-    - get: resource
-      passed: [a]
-  - get: resource
-    passed: [b]
+      steps:
+      - get: concourse
+        trigger: true
 `,
-			expected: Digraph{
-				{From: "a", To: "test"},
-				{From: "b", To: "test"},
-			},
-		},
+	},
+}
 
-		{
-			desc: "with duplicate passed",
-			content: `
-jobs:
-- name: test
-  plan:
-  - in_parallel:
-    - get: resource
-      passed: [a]
-    - get: resource2
-      passed: [a]
-`,
-			expected: Digraph{
-				{From: "a", To: "test"},
-			},
-		},
-
-		{
-			desc: "with same step duplicate passed",
-			content: `
-jobs:
-- name: test
-  plan:
-  - in_parallel:
-    - get: resource
-      passed: [a,a,a,a]
-`,
-			expected: Digraph{
-				{From: "a", To: "test"},
-			},
-		},
-	}
-
-	var (
-		err      error
-		pipeline Pipeline
-		actual   Digraph
-	)
-
-	for _, tc := range cases {
+func TestParsing(t *testing.T) {
+	for _, tc := range pipelineCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			pipeline, err = Parse(bytes.NewReader([]byte(tc.content)))
+			_, err := Parse(bytes.NewReader([]byte(tc.pipeline)))
 			if err != nil {
-				t.Errorf("should've not failed parsing")
-				return
-			}
-
-			actual, err = ToDigraph(pipeline)
-			if err != nil {
-				t.Errorf("should've not failed converting to digraph")
-				return
-			}
-
-			if !reflect.DeepEqual(actual, tc.expected) {
-				t.Errorf("%+v != %+v", actual, tc.expected)
-				return
+				t.Errorf("failed to parse pipeline\n%s\n >> %v", tc.pipeline, err)
 			}
 		})
 	}

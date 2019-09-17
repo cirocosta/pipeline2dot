@@ -1,10 +1,10 @@
 package main
 
 import (
-	"gopkg.in/yaml.v3"
 	"io"
 
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 type Pipeline struct {
@@ -16,6 +16,12 @@ type Job struct {
 	Plan PlanSequence
 }
 
+type InParallelConfig struct {
+	Steps    PlanSequence `yaml:"steps,omitempty"`
+	Limit    int          `yaml:"limit,omitempty"`
+	FailFast bool         `yaml:"fail_fast,omitempty"`
+}
+
 type PlanSequence []PlanConfig
 
 type PlanConfig struct {
@@ -24,9 +30,10 @@ type PlanConfig struct {
 	Get    string   `yaml:"get,omitempty"`
 	Passed []string `yaml:"passed,omitempty"`
 
-	Aggregate  *PlanSequence `yaml:"aggregate,omitempty"`
-	Do         *PlanSequence `yaml:"do,omitempty"`
-	InParallel *PlanSequence `yaml:"in_parallel,omitempty"`
+	Aggregate *PlanSequence `yaml:"aggregate,omitempty"`
+	Do        *PlanSequence `yaml:"do,omitempty"`
+
+	InParallel *InParallelConfig `yaml:"in_parallel,omitempty"`
 
 	Abort   *PlanConfig `yaml:"on_abort,omitempty"`
 	Ensure  *PlanConfig `yaml:"ensure,omitempty"`

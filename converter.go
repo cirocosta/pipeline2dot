@@ -1,6 +1,6 @@
 package main
 
-func ToDigraph(p Pipeline) (g Digraph, err error) {
+func ToDigraph(p Pipeline) (g Digraph) {
 	for _, job := range p.Jobs {
 		deps := unique(getJobDependencies(&job.Plan))
 
@@ -61,7 +61,7 @@ func getDependencies(cfg *PlanConfig) (dependencies []string) {
 	case cfg.Do != nil:
 		return getJobDependencies(cfg.Do)
 	case cfg.InParallel != nil:
-		return getJobDependencies(cfg.InParallel)
+		return getJobDependencies(&cfg.InParallel.Steps)
 	}
 
 	return

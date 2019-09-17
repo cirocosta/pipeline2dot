@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 type Digraph []Edge
 
 type Edge struct {
@@ -7,10 +11,10 @@ type Edge struct {
 }
 
 func ToDot(g Digraph) (content string) {
-	content += `digraph pipeline-graph {`
+	content += "digraph P {\n"
 
 	for _, edge := range g {
-		content += edge.From + "->" + edge.To + "\n"
+		content += fmt.Sprintf("  %q -> %q;\n", edge.From, edge.To)
 	}
 
 	content += "}"
